@@ -33,8 +33,10 @@ def decide_request_kind(s: RouterState) -> Literal["generate_node", "explain_nod
     ).content
     if kind == "generate":
         return "generate_node"
-    else:
+    elif kind == "explain":
         return "explain_node"
+    else:
+        raise ValueError(f"Unknown kind of work: {kind}")
 
 
 builder = StateGraph(RouterState)
