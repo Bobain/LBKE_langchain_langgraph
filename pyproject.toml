@@ -6,8 +6,12 @@ authors = [
     {name = "bobain",email = "romain.burgot@gmail.com"}
 ]
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.11,<4.0"
 dependencies = [
+    "langchain[openai] (>=1.0.3,<2.0.0)",
+    "langchain-community (>=0.4.1,<0.5.0)",
+    "langchain-text-splitters (>=1.0.0,<2.0.0)",
+    "langgraph (>=1.0.2,<2.0.0)"
 ]
 
 
