@@ -3,7 +3,6 @@ from langchain.chat_models import init_chat_model
 from typing import Literal
 from langgraph.graph import StateGraph, START, END
 import langsmith as ls  # noqa: F401
-import json
 import importlib
 from langchain.tools import tool
 from typing import Annotated
@@ -45,17 +44,15 @@ class GraphState(TypedDict):
     messages: Annotated[list[AnyMessage], add_messages]
 
 
-# class GraphState(MessagesState):
-#    pass
-
-
 def explain_node(s: GraphState):
-    message = model_with_tools.invoke(f"Explain the code: {s['messages'][-1].content}").content
+    message = model_with_tools.invoke(
+        f"Explain the code, using the tools at your disposal if needed: {s['messages'][-1].content}"
+    )
     return {"messages": message}
 
 
 def generate_node(s: GraphState):
-    message = model.invoke(f"Generate code for: {s['messages'][-1].content}").content
+    message = model.invoke(f"Generate code for: {s['messages'][-1].content}")
     return {"messages": message}
 
 
@@ -70,18 +67,11 @@ def decide_request_kind(s: GraphState) -> Literal["generate_node", "explain_node
 
 
 def invoke_node(s: GraphState):
-    s["messages"] = [model.invoke(s["messages"])]
-    return s
+    message = model.invoke(s["messages"])
+    return {"messages": message}
 
 
 builder = StateGraph(GraphState)
-
-# builder.add_node("START", START)
-# builder.add_node("END", END)
-
-# builder.set_entry_point(START)
-# builder.set_finish_point(END)
-
 
 builder.add_node("tools", ToolNode([langchain_core_exists]))
 builder.add_node(invoke_node.__name__, invoke_node)
@@ -89,10 +79,9 @@ builder.add_node(decide_request_kind.__name__, decide_request_kind)
 builder.add_node(generate_node.__name__, generate_node)
 builder.add_node(explain_node.__name__, explain_node)
 
-
-builder.add_conditional_edges("explain_node", tools_condition)
 builder.add_conditional_edges(START, decide_request_kind)
 
+builder.add_conditional_edges("explain_node", tools_condition)
 builder.add_edge("generate_node", END)
 
 builder.add_edge("tools", "invoke_node")
@@ -104,14 +93,8 @@ graph = builder.compile()
 print(graph.get_graph().draw_ascii())
 
 # Explain to me what builder.compile does in LangGraph
-for chunk in graph.stream(
-    {
-        "messages": """explain the code :
-Can ChatMistralAI be imported from langchain_core?
-"""
-    }
-):
-    print(json.dumps(chunk, indent=2))
+for chunk in graph.stream({"messages": """Can ChatMistralAI be imported from langchain_core?"""}):
+    print(chunk)
 
 # result = graph.invoke({"user_request": "Generate code to sort a list"})
 # print(result)
