@@ -5,6 +5,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain.chat_models import init_chat_model
 from langchain_openai import OpenAIEmbeddings
 from langchain.tools import tool
+import langsmith as ls  # noqa: F401
 from dotenv import load_dotenv
 
 load_dotenv()
