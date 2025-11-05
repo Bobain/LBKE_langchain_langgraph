@@ -17,7 +17,9 @@ dependencies = [
     "langchain-google-vertexai (>=3.0.2,<4.0.0)",
     "langchain-mistralai (>=1.0.1,<2.0.0)",
     "bs4 (>=0.0.2,<0.0.3)",
-    "grandalf (>=0.8,<0.9)"
+    "grandalf (>=0.8,<0.9)",
+    "langgraph-cli[inmem] (>=0.4.7,<0.5.0)",
+    "protobuf (>=6.33.0,<7.0.0)"
 ]
 
 
